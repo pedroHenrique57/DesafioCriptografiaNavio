@@ -1,0 +1,3 @@
+R:/DevProj/DesafioCriptografiaNavio/DesafioCriptografiaNavio/cmake-build-debug/CMakeFiles/DesafioCriptografiaNavio.dir
+R:/DevProj/DesafioCriptografiaNavio/DesafioCriptografiaNavio/cmake-build-debug/CMakeFiles/edit_cache.dir
+R:/DevProj/DesafioCriptografiaNavio/DesafioCriptografiaNavio/cmake-build-debug/CMakeFiles/rebuild_cache.dir
