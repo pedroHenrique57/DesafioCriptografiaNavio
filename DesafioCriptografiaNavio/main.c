@@ -23,8 +23,8 @@ int calculaEspacos(const char *texto) {
 // Pega os binários com espaços e converte para se adequar a convenção 0B00000000 para facilidade da manipulação dos dados.
 void conversaoTextoParaBinario(char *dadosBinarioCru) {
   // Calcula o tamanho exato de alocação de memória para não haver alocação de memória desnecessária.
-  // O +3 é contituido por: +2 espaços para contabilizar a não existencia de um ' ' no ultimo valor + 1 espaço para o caracter Nulo '\0'.
-  char dadosDivididosEmConjuntosDeBits[strlen(textoCriptografado) + calculaEspacos(dadosBinarioCru) + 3];
+  // O +4 é contituido por: +3 espaços para contabilizar a não existencia de um ' ' (2 espaços para o 0B e 1 para o ' ') no ultimo valor+ 1 espaço para o caracter Nulo '\0'.
+  char dadosDivididosEmConjuntosDeBits[strlen(textoCriptografado) + calculaEspacos(dadosBinarioCru) * 2 + 4];
   const char *conjuntoDeOito = strtok(dadosBinarioCru, " ");
   int tamanhoArray = 0;
 
@@ -39,6 +39,9 @@ void conversaoTextoParaBinario(char *dadosBinarioCru) {
     strncpy(&dadosDivididosEmConjuntosDeBits[tamanhoArray], conjuntoDeOito, strlen(conjuntoDeOito));
     // avança o contador de index da array para não sobrepor o dado já existente
     tamanhoArray += strlen(conjuntoDeOito);
+
+    // adiciona um espaço para separar os Byte para facilitar a navegação.
+    dadosDivididosEmConjuntosDeBits[tamanhoArray++] = ' ';
 
     // Obtém o próximo valor binario e mantem o loop até não ter mais espaços
     conjuntoDeOito = strtok(NULL, " ");
