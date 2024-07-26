@@ -3,10 +3,10 @@
 #include <string.h>
 
 // Input do código a ser descriptografado.
-// Dado salvo em memória pois foi feito para descriptografar um código específico,
-// mas se informar mais binários com o mesmo padrão de cripto, irá funcionar igualmente.
 char textoCriptografado[] =
     "10010110 11110111 01010110 00000001 00010111 00100110 01010111 00000001 00010111 01110110 01010111 00110110 11110111 11010111 01010111 00000011";
+
+char textoFormatado[];
 
 // Calcula a quantidade de espaços dentro de uma String.
 int calculaEspacos(const char *texto) {
@@ -20,44 +20,53 @@ int calculaEspacos(const char *texto) {
   return totalDeEspacos;
 }
 
-// Pega os binários com espaços e converte para se adequar a convenção 0B00000000 para facilidade da manipulação dos dados.
-void conversaoTextoParaBinario(char *dadosBinarioCru) {
+// Pega os bytes com espaços entre si e os converte para se adequar a convenção 0B00000000 para facilidade da manipulação dos dados.
+char* formatarTextoCriptografado(const char *dadosBinarioCru) {
   // Calcula o tamanho exato de alocação de memória para não haver alocação de memória desnecessária.
-  // O +4 é contituido por: +3 espaços para contabilizar a não existencia de um ' ' (2 espaços para o 0B e 1 para o ' ') no ultimo valor+ 1 espaço para o caracter Nulo '\0'.
-  char dadosDivididosEmConjuntosDeBits[strlen(textoCriptografado) + calculaEspacos(dadosBinarioCru) * 2 + 4];
-  const char *conjuntoDeOito = strtok(dadosBinarioCru, " ");
-  int tamanhoArray = 0;
+  const int tamanhoTexto = strlen(dadosBinarioCru);
+  const int quantidadeEspacos = calculaEspacos(dadosBinarioCru);
+  char* dadosDivididosEmBytes = malloc((tamanhoTexto + quantidadeEspacos * 2 + 3 + 1) * sizeof(char));
 
-  // Continua obtendo tokens até não haver mais
+  // Duplica a string para preservar o original ao usar strtok.
+  char* dadosBinarioCruDup = strdup(dadosBinarioCru);
+
+  // Utilizado para ler os Bytes dentro da array.
+  char *conjuntoDeOito = strtok(dadosBinarioCruDup, " ");
+  // Utilizado para navegar nos indexes da array para gravar os dados.
+  int indexArray = 0;
+
+  // Continua obtendo bytes até não haver mais.
   while (conjuntoDeOito != NULL) {
-    //Adiciona 0B antes do valor em binario.
-    strcpy(&dadosDivididosEmConjuntosDeBits[tamanhoArray], "0B");
-    // avança o contador de index da array para não sobrepor o dado já existente
-    tamanhoArray += 2;
+    // Adiciona 0B antes do valor em byte.
+    strcpy(&dadosDivididosEmBytes[indexArray], "0B");
+    indexArray += 2;
 
-    // Copia o valor binario para o array
-    strncpy(&dadosDivididosEmConjuntosDeBits[tamanhoArray], conjuntoDeOito, strlen(conjuntoDeOito));
-    // avança o contador de index da array para não sobrepor o dado já existente
-    tamanhoArray += strlen(conjuntoDeOito);
+    // Copia o valor binario para o array.
+    strcpy(&dadosDivididosEmBytes[indexArray], conjuntoDeOito);
+    indexArray += strlen(conjuntoDeOito);
 
     // adiciona um espaço para separar os Byte para facilitar a navegação.
-    dadosDivididosEmConjuntosDeBits[tamanhoArray++] = ' ';
+    dadosDivididosEmBytes[indexArray++] = ' ';
 
-    // Obtém o próximo valor binario e mantem o loop até não ter mais espaços
+    // Obtém o próximo valor em byte e mantem o loop até não ter mais espaços.
     conjuntoDeOito = strtok(NULL, " ");
   }
 
-  // Certifica de que a string finaliza com um caractere nulo
-  dadosDivididosEmConjuntosDeBits[tamanhoArray++] = '\0';
+  // Remove o último espaço e adiciona um caractere nulo.
+  dadosDivididosEmBytes[indexArray - 1] = '\0';
 
-  // Imprime os dados divididos
-  printf("Dados Divididos:\n%s\n", dadosDivididosEmConjuntosDeBits);
-  system("pause");
+  // Libera a memória duplicada.
+  free(dadosBinarioCruDup);
+
+  return dadosDivididosEmBytes;
 }
 
 int main(void) {
   // Primeiro formata os dados para a convenção 0B00000000 para facilidade da manipulação dos dados.
-  conversaoTextoParaBinario(textoCriptografado);
+  char* textoFormatado = formatarTextoCriptografado(textoCriptografado);
+
+  // Libera a memória alocada.
+  free(textoFormatado);
 
   return 0;
 }
