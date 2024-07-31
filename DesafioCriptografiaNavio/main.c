@@ -6,8 +6,6 @@
 char textoCriptografado[] =
     "10010110 11110111 01010110 00000001 00010111 00100110 01010111 00000001 00010111 01110110 01010111 00110110 11110111 11010111 01010111 00000011";
 
-char textoFormatado[];
-
 // Calcula a quantidade de espaços dentro de uma String.
 int calculaEspacos(const char *texto) {
   int totalDeEspacos = 0;
@@ -64,7 +62,8 @@ char* formatarTextoCriptografado(const char *dadosBinarioCru) {
 int main(void) {
   // Primeiro formata os dados para a convenção 0B00000000 para facilidade da manipulação dos dados.
   char* textoFormatado = formatarTextoCriptografado(textoCriptografado);
-
+  printf("%p\n\n", &textoCriptografado);
+  printf("%p", &textoFormatado);
   // Libera a memória alocada.
   free(textoFormatado);
 
