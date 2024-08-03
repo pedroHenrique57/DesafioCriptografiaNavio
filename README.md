@@ -1,3 +1,4 @@
+# O Desafio:
 ## Criptografia na rede do navio
 
 
@@ -29,3 +30,31 @@ A intelitrader foi contratada para traduzir uma mensagem capturada na rede de um
   * Operadores lógicos
   * Números binários e hexadecimais
 * Você saberá se conseguiu descriptografar a mensagem se ela for legível e em inglês. Pois, qualquer bit errado, você terá uma mensagem cheia de símbolos.
+
+
+# Minha Documentação:
+
+## Projeto Criptografia do Navio
+Este projeto foi realizado para o aprendizado da linguagem C e realização do Challenge `Criptografia na rede do navio`.  
+Ele foi Programado com a linguagem C23, consumindo bibliotecas nativas do C.
+
+## Tecnologias Utilizadas
+
+- C23
+- IDE Clion
+- MinGW-w64
+
+# Como Executar.
+
+O Programa pode ser rodado no windows, executando o arquivo: `DesafioCriptografiaNavio\cmake-build-debug\DesafioCriptografiaNavio.exe` ou ser executado localmente atráves do arquivo `main.c`.  
+> [!TIP]
+> Caso não queira baixar o repositório, você pode rodar o código contido no arquivo `main.c` em um compilador online de C.  
+> Minha sugestão de site: https://www.onlinegdb.com/online_c_compiler
+
+## Contribuições
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e pull requests para melhorias e correções.
+
+## Licença
+
+Este projeto está licenciado sob a licença MIT. Acesse o arquivo `LICENSE` para mais informações.
