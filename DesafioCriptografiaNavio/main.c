@@ -4,9 +4,21 @@
 
 // Input do código a ser descriptografado.
 char textoCriptografado[] =
-    "10010110 11110111 01010110 00000001 00010111 00100110 01010111 00000001 00010111 01110110 01010111 00110110 11110111 11010111 01010111 00000011";
+    "10010110 11110111 01010110 00000001 00010111 00100110 01010111 00000001 00010111 01110110 01010111 00110110 "
+    "11110111 11010111 01010111 00000011";
 
-char textoFormatado[];
+// Criação dos protótipos
+char *tradutorCriptografia(const char *textoCriptografado);
+
+char *inverteUltimosDoisBit(const char *charByteToken);
+
+char *trocaMetadeBit(const char *charByteTokenInvertido);
+
+char binarioParaChar(const char *binario);
+
+int calculaEspacos(const char *texto);
+
+// Implementação dos metodos
 
 // Calcula a quantidade de espaços dentro de uma String.
 int calculaEspacos(const char *texto) {
@@ -20,53 +32,99 @@ int calculaEspacos(const char *texto) {
   return totalDeEspacos;
 }
 
-// Pega os bytes com espaços entre si e os converte para se adequar a convenção 0B00000000 para facilidade da manipulação dos dados.
-char* formatarTextoCriptografado(const char *dadosBinarioCru) {
-  // Calcula o tamanho exato de alocação de memória para não haver alocação de memória desnecessária.
-  const int tamanhoTexto = strlen(dadosBinarioCru);
-  const int quantidadeEspacos = calculaEspacos(dadosBinarioCru);
-  char* dadosDivididosEmBytes = malloc((tamanhoTexto + quantidadeEspacos * 2 + 3 + 1) * sizeof(char));
+// Inverte os valores binários dos ultimos dois bits
+char *inverteUltimosDoisBit(const char *charByteToken) {
+  char *charByte = malloc(9 * sizeof(char));
+  for (int i = 0; i < 8; i++) {
+    if (i == 6 || i == 7) {
+      strcpy(&charByte[i], ((charByteToken[i] == '1') ? "0" : "1"));
+    } else {
+      strcpy(&charByte[i], ((charByteToken[i] == '1') ? "1" : "0"));
+    }
+  }
+  // Adiciona null para terminar a string
+  charByte[8] = '\0';
+  return charByte;
+}
 
-  // Duplica a string para preservar o original ao usar strtok.
-  char* dadosBinarioCruDup = strdup(dadosBinarioCru);
+// Inverte os 4 primeiros bits com os 4 ultimos
+char *trocaMetadeBit(const char *charByteTokenInvertido) {
+  // Aloca a memória para o armazenamento dos bits
+  char *byteTrocado = malloc(9 * sizeof(char));
 
-  // Utilizado para ler os Bytes dentro da array.
-  char *conjuntoDeOito = strtok(dadosBinarioCruDup, " ");
+  // Pega os ultimos 4 e os 4 primeiros e salva dentro das variáveis
+  for (int i = 0; i < 4; i++) {
+    byteTrocado[i] = charByteTokenInvertido[i + 4];
+    byteTrocado[i + 4] = charByteTokenInvertido[i];
+  }
+  // Termina a string com um caractere nulo
+  byteTrocado[8] = '\0';
+
+  return byteTrocado;
+}
+
+// Recebe um valor em byte e o converte pra ASCII Code
+char binarioParaChar(const char *byte) {
+  int asciiCode = 0;
+  for (int i = 0; i < 8; i++) {
+    asciiCode = asciiCode * 2 + (byte[i] - '0');
+  }
+  return asciiCode;
+}
+
+// Responsável por realizar a descriptografia.
+char *tradutorCriptografia(const char *textoCriptografado) {
+  // Calcula o tamanho exato de alocação de memória Baseado na quantidade de Bytes.
+  char *textoDescriptografado = malloc((calculaEspacos(textoCriptografado) + 1) * sizeof(char));
+
+  // Duplica a string para preservar a original ao usar strtok.
+  char *textoCriptografadoDup = strdup(textoCriptografado);
+
+  // Utilizado para ler o primeiro Byte dentro da array.
+  char *charByteToken = strtok(textoCriptografadoDup, " ");
+
   // Utilizado para navegar nos indexes da array para gravar os dados.
-  int indexArray = 0;
+  int indexTextoDescriptografado = 0;
 
-  // Continua obtendo bytes até não haver mais.
-  while (conjuntoDeOito != NULL) {
-    // Adiciona 0B antes do valor em byte.
-    strcpy(&dadosDivididosEmBytes[indexArray], "0B");
-    indexArray += 2;
+  // Continua obtendo charBytesToken até não haver mais.
+  while (charByteToken != NULL) {
+    // Inverte os dois ultimos bits
+    char *byteInvertido = inverteUltimosDoisBit(charByteToken);
 
-    // Copia o valor binario para o array.
-    strcpy(&dadosDivididosEmBytes[indexArray], conjuntoDeOito);
-    indexArray += strlen(conjuntoDeOito);
+    // Inverte os 4 primeiros bits com os 4 ultimos
+    char *byteTrocado = trocaMetadeBit(byteInvertido);
+    // Transforma o valor em binário para caractere e salva na variável.
+    textoDescriptografado[indexTextoDescriptografado++] = binarioParaChar(byteTrocado);
 
-    // adiciona um espaço para separar os Byte para facilitar a navegação.
-    dadosDivididosEmBytes[indexArray++] = ' ';
+    // Obtém o próximo valor em charByteToken de onde parou e mantem o loop até não ter mais espaços.
+    charByteToken = strtok(NULL, " ");
 
-    // Obtém o próximo valor em byte e mantem o loop até não ter mais espaços.
-    conjuntoDeOito = strtok(NULL, " ");
+    //Libera os espaços alocados para próxima iteração
+    free(byteTrocado);
+    free(byteInvertido);
   }
 
-  // Remove o último espaço e adiciona um caractere nulo.
-  dadosDivididosEmBytes[indexArray - 1] = '\0';
+  // Termina a string com um caractere nulo.
+  textoDescriptografado[indexTextoDescriptografado++] = '\0';
 
   // Libera a memória duplicada.
-  free(dadosBinarioCruDup);
+  free(textoCriptografadoDup);
 
-  return dadosDivididosEmBytes;
+  return textoDescriptografado;
 }
 
 int main(void) {
-  // Primeiro formata os dados para a convenção 0B00000000 para facilidade da manipulação dos dados.
-  char* textoFormatado = formatarTextoCriptografado(textoCriptografado);
+  //Executa a descriptografia
+  char *textoDescriptografado = tradutorCriptografia(textoCriptografado);
+
+  //Exibe as variáveis no terminal
+  printf("Texto Criptografado: %s\n\n", textoCriptografado);
+  printf("Texto Descriptografado: %s\n\n", textoDescriptografado);
 
   // Libera a memória alocada.
-  free(textoFormatado);
+  free(textoDescriptografado);
 
+  // Pausa o terminal para leitura de dados.
+  system("pause");
   return 0;
 }
